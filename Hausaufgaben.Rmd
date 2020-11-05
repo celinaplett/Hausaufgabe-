@@ -3,26 +3,32 @@ title: "Hausaufgabe"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#Laden der Libraries und Daten
+```{r}
+library(tidyverse)
 ```
 
-## R Markdown
+```{r}
+BX_Book_Ratings <- read_delim("BX-Book-Ratings.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+BX_Books <- read_delim("BX-Books.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+BX_Users <- read_delim("BX-Users.csv", 
+    ";", escape_double = FALSE, trim_ws = TRUE)
+```
+Gibt es eine lineare Beziehung zwischen Anzahl Bücher pro Publisher und Anzahl Ratings, die die Bücher eines Publishers erhalten? (hier müssen Sie wieder etwas Data Wrangling betreiben)
+Erstellen einer passenden Tabelle 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Anzahl Ratings, die die Bücher eines Publishers erhalten
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Anzahl Bücher pro Publisher 
 
-```{r cars}
-summary(cars)
+```{r}
+ratings_best_books %>%
+  group_by(`Publisher`) %>%
+  summarise(Menge = n()) %>%
+  arrange(desc(Menge)) 
 ```
 
-## Including Plots
+Haben ältere Bücher mehr Ratings, weil sie mehr Zeit haben, um Ratings zu sammeln? (muss nicht unbedingt mit einer linearen Regression analysiert werden)
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
