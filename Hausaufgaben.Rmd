@@ -2,7 +2,6 @@
 title: "Hausaufgabe"
 output: html_document
 ---
-
 #Laden der Libraries und Daten
 ```{r}
 library(tidyverse)
@@ -16,19 +15,50 @@ BX_Books <- read_delim("BX-Books.csv",
 BX_Users <- read_delim("BX-Users.csv", 
     ";", escape_double = FALSE, trim_ws = TRUE)
 ```
-Gibt es eine lineare Beziehung zwischen Anzahl Bücher pro Publisher und Anzahl Ratings, die die Bücher eines Publishers erhalten? (hier müssen Sie wieder etwas Data Wrangling betreiben)
-Erstellen einer passenden Tabelle 
+1. Gibt es eine lineare Beziehung zwischen Anzahl Bücher pro Publisher und Anzahl Ratings, die die Bücher eines Publishers erhalten? 
 
-Anzahl Ratings, die die Bücher eines Publishers erhalten
-
-Anzahl Bücher pro Publisher 
+Zunächst muss jeweils eine Tabelle erstellt werden, für Anzahl der Bücher und Anzahl der Bewertungen pro Publisher 
+Anzahl der Bücher: 
+```{r}
+Tabelle_Bücher <- BX_Books %>%
+  group_by(`Book-Title`) %>% 
+  summarise(Anzahl = n()) 
+```
+ Anzahl Bewertungen pro Publisher: 
+ Zunächst muss eine Join-Tabelle erstellt werden 
+```{r}
+ratings_best_books <- BX_Book_Ratings %>%
+  left_join(BX_Books)
+```
 
 ```{r}
-ratings_best_books %>%
+Tabelle_Publisher <- ratings_best_books %>%
   group_by(`Publisher`) %>%
   summarise(Menge = n()) %>%
   arrange(desc(Menge)) 
 ```
+Diese beiden Tabellen werden nun gejoint: 
+```{r}
+fertig <- ratings_best_books %>%
+  left_join(Tabelle_Bücher)
+```
 
-Haben ältere Bücher mehr Ratings, weil sie mehr Zeit haben, um Ratings zu sammeln? (muss nicht unbedingt mit einer linearen Regression analysiert werden)
+Aus der erstellten Join-Tabelle wird ein Diagramm erstellt: 
 
+```{r}
+fit <- lm(fertig$`Book-Rating` ~ fertig$`Anzahl`)
+```
+
+```{r}
+plot(fertig) %>%
+abline(fit)
+```
+Theoretisch sollte an diesem Punkt ein Diagramm ausgegeben werden, doch R Studio stürzt bei dem Versuch der Ausagbe jedes mal ab. Den Grund dafür, konnte ich leider nicht herausfinden. 
+
+
+2. Haben ältere Bücher mehr Ratings, weil sie mehr Zeit haben, um Ratings zu sammeln? (muss nicht unbedingt mit einer linearen Regression analysiert werden)
+
+Dies ist abhängig davon, ob die Datenerhebung zu einem gesetzten Zeitpunkt oder sukzessive (z.B. seit dem Zeitpunkt der Veröffentlichung des Buches) fortgeführt wird. 
+Wenn die Datenerhebung zu einem gesetzten Zeitpunkt stattfindet, haben ältere Bücher nicht die Möglichkeit mehr Ratings zu sammeln, da diese alle zur selben Zeit erstellt werden. 
+Sollte die Erhebung allerdings ab dem Zeitpunkt der Veröffentlichung stattfindet, haben ältere Bücher theoretisch mehr Zeit Ratings zu sammeln. Dies muss allerdings nicht zwangsläufig bedeuten, dass sie auch eine höhere Anzahl an Ratings haben. Wenn das entsprechende Buch z.B. nicht sonderlich gefragt ist, erhält es weniger Ratings auch bei einer längeren Sammel-Möglichkeit. 
+Sollte ein Buch also viel gefragt sein und die Datenerhebung ab dem Zeitpunkt der Erstveröffentlichung stattfindet, könnte das Buch durchaus mehr Ratings haben.
