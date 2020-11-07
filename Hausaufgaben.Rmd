@@ -72,7 +72,7 @@ ratings_best_books %>%
   filter(`Book-Rating` > 0) 
 ```
 
-```{r}
+```{r} 
 ratings_best_books %>%
   select(`Book-Title`,`Year-Of-Publication`,`Book-Rating`) %>%
   filter(`Year-Of-Publication` < 1995) %>%
