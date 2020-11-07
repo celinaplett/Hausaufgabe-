@@ -18,7 +18,8 @@ BX_Users <- read_delim("BX-Users.csv",
 1. Gibt es eine lineare Beziehung zwischen Anzahl Bücher pro Publisher und Anzahl Ratings, die die Bücher eines Publishers erhalten? 
 
 Zunächst muss jeweils eine Tabelle erstellt werden, für Anzahl der Bücher und Anzahl der Bewertungen pro Publisher 
-Anzahl der Bücher: 
+Anzahl der Publisher:
+
 ```{r}
 Tabelle_Bücher <- BX_Books %>%
   group_by(`Book-Title`) %>% 
@@ -55,10 +56,27 @@ abline(fit)
 ```
 Theoretisch sollte an diesem Punkt ein Diagramm ausgegeben werden, doch R Studio stürzt bei dem Versuch der Ausagbe jedes mal ab. Den Grund dafür, konnte ich leider nicht herausfinden. 
 
-
 2. Haben ältere Bücher mehr Ratings, weil sie mehr Zeit haben, um Ratings zu sammeln? (muss nicht unbedingt mit einer linearen Regression analysiert werden)
 
 Dies ist abhängig davon, ob die Datenerhebung zu einem gesetzten Zeitpunkt oder sukzessive (z.B. seit dem Zeitpunkt der Veröffentlichung des Buches) fortgeführt wird. 
 Wenn die Datenerhebung zu einem gesetzten Zeitpunkt stattfindet, haben ältere Bücher nicht die Möglichkeit mehr Ratings zu sammeln, da diese alle zur selben Zeit erstellt werden. 
 Sollte die Erhebung allerdings ab dem Zeitpunkt der Veröffentlichung stattfindet, haben ältere Bücher theoretisch mehr Zeit Ratings zu sammeln. Dies muss allerdings nicht zwangsläufig bedeuten, dass sie auch eine höhere Anzahl an Ratings haben. Wenn das entsprechende Buch z.B. nicht sonderlich gefragt ist, erhält es weniger Ratings auch bei einer längeren Sammel-Möglichkeit. 
 Sollte ein Buch also viel gefragt sein und die Datenerhebung ab dem Zeitpunkt der Erstveröffentlichung stattfindet, könnte das Buch durchaus mehr Ratings haben.
+
+Um dies herauszufinden, kann eine der Join-Tabellen verwendet werden. 
+
+```{r}
+ratings_best_books %>%
+  select(`Book-Title`,`Year-Of-Publication`,`Book-Rating`) %>%
+  filter(`Year-Of-Publication` < 2020) %>%
+  filter(`Book-Rating` > 0) 
+```
+
+```{r}
+ratings_best_books %>%
+  select(`Book-Title`,`Year-Of-Publication`,`Book-Rating`) %>%
+  filter(`Year-Of-Publication` < 1995) %>%
+  filter(`Book-Rating` > 0) 
+```
+
+
