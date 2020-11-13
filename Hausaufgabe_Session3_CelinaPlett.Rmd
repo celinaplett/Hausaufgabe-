@@ -8,11 +8,11 @@ library(tidyverse)
 library(arules)
 library(arulesViz)
 ```
-Zunächst wird die CSV mit allen Datensätzen eingelesen. 
+Zunächst wird die CSV-Datei mit allen Datensätzen eingelesen. 
 ```{r}
 all <- read_csv("all.csv")
 ```
-Aufgabe 1 
+Aufgabe 1: 
 Erstellen Sie eine Analyse, bei der nicht die Bücher, sondern die Autoren in den Transaktionen enthalten sind. 
 
 ```{r}
@@ -20,11 +20,13 @@ i <- split(all$`Book-Author`,all$`User-ID`)
 txn <- as(i, "transactions")
 basket_rules <- apriori(txn, parameter = list(sup = 0.0015, conf = 0.001, minlen=2, target="rules"))
 ```
+
 ```{r}
 myRules_Direct <- as(basket_rules, "data.frame")
 basket_rules_hi <- head(basket_rules, by ="lift",100)
 head(myRules_Direct, 50)
 ```
+
 ```{r}
 plot(basket_rules_hi, method="graph", main="Books")
 ```
@@ -32,15 +34,16 @@ plot(basket_rules_hi, method="graph", main="Books")
 ```{r}
 plot(basket_rules_hi, method="graph", main="Books", engine="interactive")
 ```
-Aufgabe 2 
+Aufgabe 2: 
 Fällt Ihnen etwas in der Datenqualität auf?
 
-Sehr viele Transaktionen verweisen lediglich auf denselben Autoren in einer anderen Schreibweise, z.B.: {SOPHIE KINSELLA} => {Sophie Kinsella}. Zudem werden dieselebn Autoren auch oft gegenseitig erwähnt, z.B.: {Oscar Wilde} => {Stephen King} und direkt in der darauffolgenden Zeile {Stephen King} => {Oscar Wilde}. 
+Einige der Transaktionen verweisen lediglich auf denselben Autoren in einer anderen Schreibweise, z.B.: {SOPHIE KINSELLA} => {Sophie Kinsella}. Zudem werden dieselben Autoren auch oft gegenseitig erwähnt, z.B.: {William Gibson}} => {Stephen King} und direkt in der darauffolgenden Zeile erscheint {Stephen King} => {William Gibson}}. 
 
-Aufgabe 3 
+Aufgabe 3: 
 Wie könnte man das mit regulären Ausdrücken beheben?
 
-Man könnte einen regulären Ausdruck anwenden, welcher alle komplett großgeschriebenen Autoren aus dem Datensatz entfernt. Jedoch funktioniert der entsprechende Code leider nicht ganz. 
+Leider habe ich es an dieser Stelle nicht geschafft einen funktionierenden Code zu schreiben, daher folgen zwei mögliche Ansätze:
+Man könnte einen regulären Ausdruck anwenden, welcher alle komplett großgeschriebenen Autoren aus dem Datensatz entfernt. 
 ```{r}
 all <- all %>%  
   mutate(`Book-Author`= str_remove (`Book-Author`, "[A-Z] *X*"))
@@ -52,7 +55,7 @@ all <- all %>%
 mutate(all = tolower(all$`Book-Author`))
 ```
 
-Aufgabe 4
+Aufgabe 4: 
 Wie kann man nun noch sicherstellen, dass nur die Autoren weiterempfohlen werden, deren Bücher man auch (mehrheitlich) gut fand?
 
 Indem man auch das Book-Rating bei der Anwendung des apriori-Algorithmus berücksichtigt. 
@@ -61,18 +64,21 @@ j <- split(all$`Book-Author`,all$`User-ID`,all$`Book-Rating` == 10)
 txn <- as(i, "transactions")
 basket_rules <- apriori(txn, parameter = list(sup = 0.0010, conf = 0.001, minlen=2, target="rules")) 
 ```
+
 ```{r}
 myRules_Direct <- as(basket_rules, "data.frame")
 basket_rules_hi <- head(basket_rules, by ="lift",100)
 head(myRules_Direct, 50 )
 ```
+
 ```{r}
 plot(basket_rules_hi, method="graph", main="Books")
 ```
+
 ```{r}
 plot(basket_rules_hi, method="graph", main="Books", engine="interactive")
 ```
-Aufgabe 5 
+Aufgabe 5: 
 Welche anderen Features wären sinnvoll?
 
 Eine Kombination aus den am Besten bewerteten Autoren und den am Besten bewerteten Büchern wäre sinnvoll. 
